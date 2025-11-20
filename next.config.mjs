@@ -1,19 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-// Force Vercel to use Webpack instead of Turbopack
+// Keep Turbopack off so we use Webpack (more stable with our deps)
 experimental: {
-turbo: {
-loaders: {
-".js": false,
-".jsx": false,
-".ts": false,
-".tsx": false,
+webpackBuildWorker: false,
 },
-},
-},
+
+// Webpack customization
 webpack: (config) => {
+// Tell Webpack to ignore the React Native async storage module
+// that MetaMask SDK tries to optionally import.
+config.resolve = config.resolve || {};
+config.resolve.alias = {
+...(config.resolve.alias || {}),
+'@react-native-async-storage/async-storage': false,
+};
+
 return config;
 },
 };
 
-export default nextConfig;
+export default nextConfig
