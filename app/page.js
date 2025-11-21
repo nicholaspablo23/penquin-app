@@ -2,15 +2,15 @@
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 
-// ---- CONSTANTS ----
+// ---------- CONSTANTS ----------
 
 // PENQUIN token (ETH mainnet)
 const PENQUIN_ADDRESS = "0xc05202bb0BcD2e30AE68F596622eD00ca94556Ba";
 
-// WETH (ETH mainnet) – checksummed EXACTLY
+// WETH (ETH mainnet)
 const WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 
 // USDC (ETH mainnet)
@@ -19,7 +19,7 @@ const USDC_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 // Uniswap V2 router (ETH mainnet)
 const UNISWAP_V2_ROUTER = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
-// Minimal ABI...
+// Minimal ABI for swapExactETHForTokensSupportingFeeOnTransferTokens
 const UNISWAP_V2_ABI = [
 "function swapExactETHForTokensSupportingFeeOnTransferTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) payable",
 ];
@@ -27,14 +27,7 @@ const UNISWAP_V2_ABI = [
 export default function Page() {
 const { address, isConnected } = useAccount();
 
-// Live PENQUIN balance
-const { data: balanceData, isLoading: balLoading } = useBalance({
-address,
-token: PENQUIN_ADDRESS,
-watch: true,
-});
-
-// Local UI state
+// ---------- LOCAL UI STATE ----------
 const [mounted, setMounted] = useState(false);
 const [ethAmount, setEthAmount] = useState("0.01");
 const [isSwapping, setIsSwapping] = useState(false);
@@ -65,28 +58,33 @@ console.error("Error fetching ETH price:", err);
 
 fetchPrice();
 const id = setInterval(fetchPrice, 60_000); // refresh every 60s
-
 return () => clearInterval(id);
 }, []);
 
-const balance = balanceData?.value ?? 0n;
-
-// ---- SWAP HANDLER ----
+// ---------- SWAP HANDLER ----------
 async function handleSwap() {
 setError("");
 setTxHash("");
 
 try {
 if (typeof window === "undefined" || !window.ethereum) {
-setError("No wallet found. Please install MetaMask.");
+setError("No wallet found. Please install MetaMask or another Web3 wallet.");
 return;
 }
-if (!address) {
+
+if (!address || !isConnected) {
 setError("Connect your wallet first.");
 return;
 }
 
-const value = ethers.parseEther(ethAmount || "0");
+let value;
+try {
+value = ethers.parseEther(ethAmount || "0");
+} catch {
+setError("Enter a valid ETH amount.");
+return;
+}
+
 if (value <= 0n) {
 setError("Enter a valid ETH amount.");
 return;
@@ -97,9 +95,8 @@ setIsSwapping(true);
 const provider = new ethers.BrowserProvider(window.ethereum);
 const signer = await provider.getSigner();
 
-// Route: ETH -> WETH -> USDC -> PENQUIN (via USDC pool)
+// Route: ETH -> WETH -> USDC -> PENQUIN
 const path = [WETH_ADDRESS, USDC_ADDRESS, PENQUIN_ADDRESS];
-
 const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes
 
 const router = new ethers.Contract(
@@ -121,15 +118,15 @@ const receipt = await tx.wait();
 setTxHash(receipt.hash ?? tx.hash);
 } catch (err) {
 console.error(err);
-if (err && err.code === "CALL_EXCEPTION") {
+if (err?.code === "CALL_EXCEPTION") {
 setError(
 "Swap reverted. Check that there is Uniswap V2 liquidity for the ETH → USDC → PENQUIN route."
 );
+} else if (err?.code === "ACTION_REJECTED") {
+setError("Swap rejected in wallet.");
 } else {
 setError(
-err?.shortMessage ||
-err?.message ||
-"Swap failed. Check console for details."
+err?.shortMessage || err?.message || "Swap failed. Check console."
 );
 }
 } finally {
@@ -140,16 +137,8 @@ setIsSwapping(false);
 // Prevent hydration mismatch
 if (!mounted) return null;
 
-const formattedBalance =
-balanceData && !balLoading
-? Number(
-ethers.formatUnits(balanceData.value, balanceData.decimals)
-).toLocaleString(undefined, {
-maximumFractionDigits: 4,
-})
-: "0";
-
-const swapDisabled = !isConnected || isSwapping;
+const swapDisabled =
+!isConnected || isSwapping || !ethAmount || Number(ethAmount) <= 0;
 
 return (
 <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 text-white flex items-center justify-center p-4 sm:p-8">
@@ -159,11 +148,23 @@ return (
 {/* Left: Logo + titles */}
 <div className="flex items-start gap-4">
 {/* Logo box */}
-<div className="flex items-center justify-center w-20 h-20 rounded-full shadow-[0_0_22px_rgba(255,204,0,0.75)] animate-auraflow bg-slate-950/80">
+<div
+className="
+flex items-center justify-center
+w-20 h-20
+rounded-full
+shadow-[0_0_22px_rgba(255,204,0,0.75)]
+animate-auraflow
+"
+>
 <img
 src="/penquin-logo.png"
 alt="PENQUIN Logo"
-className="w-22 h-22 object-contain drop-shadow-[0_0_14px_rgba(255,200,0,0.55)]"
+className="
+w-20 h-20
+object-contain
+drop-shadow-[0_0_14px_rgba(255,200,0,0.55)]
+"
 />
 </div>
 
@@ -172,12 +173,19 @@ className="w-22 h-22 object-contain drop-shadow-[0_0_14px_rgba(255,200,0,0.55)]"
 <p className="text-xs font-semibold tracking-[0.2em] text-sky-400 uppercase">
 PenQuiQui Control Panel
 </p>
-<h1 className="text-3xl sm:text-4xl font-semibold bg-gradient-to-r from-sky-200 via-emerald-300 to-amber-200 bg-clip-text text-transparent">
+<h1
+className="
+text-3xl sm:text-4xl
+font-semibold
+bg-gradient-to-r from-sky-200 via-emerald-300 to-amber-200
+bg-clip-text text-transparent
+"
+>
 PENQUIN Dashboard
 </h1>
 <p className="text-sm text-slate-300 max-w-xl">
-Connect your wallet, check your holdings, and swap ETH directly
-into <span className="font-semibold">PENQUIN</span>.
+Connect your wallet and swap ETH directly into{" "}
+<span className="font-semibold">PENQUIN</span>.
 </p>
 
 <div className="flex flex-wrap gap-2 pt-1">
@@ -191,57 +199,52 @@ Token: PENQUIN
 </div>
 </div>
 
-{/* Right: Connect button */}
+{/* Right: Connect Button */}
 <div className="self-stretch flex items-start sm:items-center justify-end">
-<ConnectButton
-showBalance={false}
-chainStatus="icon"
-accountStatus="address"
-/>
+<ConnectButton showBalance={false} />
 </div>
 </div>
 
 {/* Main content */}
 <div className="grid md:grid-cols-2 gap-5 md:gap-6">
-{/* Balance card */}
+{/* Info card where balance used to be */}
 <div className="rounded-2xl border border-sky-700/40 bg-slate-900/70 p-5 sm:p-6 flex flex-col justify-between">
 <div className="flex items-center justify-between gap-2 mb-3">
 <h2 className="text-base font-semibold text-sky-100">
-Your PENQUIN Balance
+PENQUIN Wallet Info
 </h2>
 <span className="px-2 py-0.5 rounded-full text-[10px] border border-sky-500/60 bg-sky-900/60 text-sky-100">
-Live on-chain
+Quick reference
 </span>
 </div>
 
-{isConnected ? (
 <div className="space-y-3">
-{balLoading ? (
-<p className="text-slate-300 text-sm">Fetching balance…</p>
-) : (
-<p className="text-3xl sm:text-4xl font-semibold tracking-tight">
-{formattedBalance}{" "}
-<span className="text-sky-300 text-xl align-middle">
-PENQUIN
-</span>
+{isConnected ? (
+<p className="text-sm text-slate-200">
+Wallet connected. Your PENQUIN balance will show inside your
+wallet (MetaMask, Rainbow, Phantom etc.) once you&apos;ve bought
+tokens.
 </p>
-)}
-<p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
-PENQUIN · Contract:{" "}
-<span className="font-mono break-all text-slate-300">
-{PENQUIN_ADDRESS}
-</span>
-</p>
-</div>
 ) : (
 <p className="text-sm text-slate-300">
-Connect your wallet to view your PENQUIN balance.
+Connect your wallet using the button in the top-right, then
+use the swap panel to buy PENQUIN.
 </p>
 )}
 
+<div className="text-[11px] text-slate-400 mt-2 space-y-1">
+<p className="font-semibold text-slate-200">
+PENQUIN Contract (ETH):
+</p>
+<p className="font-mono break-all text-slate-300">
+{PENQUIN_ADDRESS}
+</p>
+</div>
+</div>
+
 <div className="mt-4 pt-4 border-t border-slate-700/60 text-[11px] text-slate-400">
-Tip: After your first swap, add PENQUIN to your wallet using this
-contract address so balances show up nicely.
+Tip: Add this contract as a custom token in your wallet so
+PENQUIN shows up in your asset list automatically.
 </div>
 </div>
 
@@ -257,7 +260,7 @@ ETH → PENQUIN
 </div>
 
 <p className="text-sm text-slate-100/90">
-Swap ETH for PENQUIN directly.
+Swap ETH for PENQUIN 
 </p>
 
 <div className="space-y-3">
@@ -269,7 +272,12 @@ min="0"
 step="0.0001"
 value={ethAmount}
 onChange={(e) => setEthAmount(e.target.value)}
-className="flex-1 rounded-xl bg-slate-900/80 border border-slate-600/70 px-3.5 py-2.5 text-sm text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400/70 placeholder:text-slate-500"
+className="
+flex-1 rounded-xl bg-slate-900/80 border border-slate-600/70
+px-3.5 py-2.5 text-sm text-slate-50
+focus:outline-none focus:ring-2 focus:ring-amber-400/70
+placeholder:text-slate-500
+"
 placeholder="0.01"
 />
 <span className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-600/70 text-xs font-semibold text-slate-100">
@@ -289,12 +297,19 @@ maximumFractionDigits: 2,
 
 <button
 onClick={handleSwap}
-disabled={swapDisabled}
-className={`w-full mt-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 text-slate-900 font-semibold py-3 shadow-[0_12px_30px_rgba(250,204,21,0.45)] transition-all ${
-swapDisabled
-? "opacity-60 cursor-not-allowed"
-: "hover:shadow-[0_16px_40px_rgba(250,204,21,0.75)] hover:scale-[1.02] active:scale-[0.99] cursor-pointer"
-}`}
+disabled={!isConnected || isSwapping}
+className="
+w-full mt-2
+rounded-full
+bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300
+text-slate-900 font-semibold
+py-3
+shadow-[0_12px_30px_rgba(250,204,21,0.45)]
+transition-all duration-200 ease-out
+hover:scale-105 hover:shadow-[0_18px_45px_rgba(250,204,21,0.85)]
+disabled:opacity-60 disabled:cursor-not-allowed
+animate-pulse-subtle
+"
 >
 {isSwapping ? "Swapping..." : "Swap ETH for PENQUIN"}
 </button>

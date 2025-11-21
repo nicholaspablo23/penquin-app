@@ -1,34 +1,40 @@
-"use client";
-
-import "@rainbow-me/rainbowkit/styles.css";
-import {
-RainbowKitProvider,
-darkTheme,
-getDefaultConfig,
-} from "@rainbow-me/rainbowkit";
-import { WagmiProvider, http } from "wagmi";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { mainnet } from "wagmi/chains";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { publicProvider } from "wagmi/providers/public";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
-const config = getDefaultConfig({
-appName: "PENQUIN dApp",
-projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID ?? "",
-chains: [mainnet],
-transports: {
-[mainnet.id]: http(process.env.NEXT_PUBLIC_RPC_URL ?? ""),
+const { chains, publicClient } = configureChains(
+[mainnet],
+[
+jsonRpcProvider({
+rpc: (chain) => {
+if (chain.id !== mainnet.id) return null;
+return {
+http: process.env.NEXT_PUBLIC_RPC_URL,
+};
 },
+}),
+publicProvider(),
+]
+);
+
+const { connectors } = getDefaultWallets({
+appName: "PENQUIN Dashboard",
+projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID,
+chains,
 });
 
-const queryClient = new QueryClient();
+const wagmiConfig = createConfig({
+autoConnect: true,
+connectors,
+publicClient,
+});
 
 export function Providers({ children }) {
 return (
-<WagmiProvider config={config}>
-<QueryClientProvider client={queryClient}>
-<RainbowKitProvider theme={darkTheme()}>
-{children}
-</RainbowKitProvider>
-</QueryClientProvider>
-</WagmiProvider>
+<WagmiConfig config={wagmiConfig}>
+<RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
+</WagmiConfig>
 );
 }
