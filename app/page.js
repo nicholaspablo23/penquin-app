@@ -1,5 +1,6 @@
 "use client";
 
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { ethers } from "ethers";
@@ -64,6 +65,7 @@ console.error("Error fetching ETH price:", err);
 
 fetchPrice();
 const id = setInterval(fetchPrice, 60_000); // refresh every 60s
+
 return () => clearInterval(id);
 }, []);
 
@@ -97,6 +99,7 @@ const signer = await provider.getSigner();
 
 // Route: ETH -> WETH -> USDC -> PENQUIN (via USDC pool)
 const path = [WETH_ADDRESS, USDC_ADDRESS, PENQUIN_ADDRESS];
+
 const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes
 
 const router = new ethers.Contract(
@@ -118,12 +121,16 @@ const receipt = await tx.wait();
 setTxHash(receipt.hash ?? tx.hash);
 } catch (err) {
 console.error(err);
-if (err.code === "CALL_EXCEPTION") {
+if (err && err.code === "CALL_EXCEPTION") {
 setError(
 "Swap reverted. Check that there is Uniswap V2 liquidity for the ETH → USDC → PENQUIN route."
 );
 } else {
-setError(err?.shortMessage || err?.message || "Swap failed. Check console.");
+setError(
+err?.shortMessage ||
+err?.message ||
+"Swap failed. Check console for details."
+);
 }
 } finally {
 setIsSwapping(false);
@@ -142,6 +149,8 @@ maximumFractionDigits: 4,
 })
 : "0";
 
+const swapDisabled = !isConnected || isSwapping;
+
 return (
 <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 text-white flex items-center justify-center p-4 sm:p-8">
 <div className="w-full max-w-4xl rounded-3xl border border-sky-700/40 bg-slate-950/70 shadow-[0_0_45px_rgba(56,189,248,0.45)] backdrop-blur-xl px-5 py-6 sm:px-8 sm:py-8 space-y-6">
@@ -150,23 +159,11 @@ return (
 {/* Left: Logo + titles */}
 <div className="flex items-start gap-4">
 {/* Logo box */}
-<div
-className="
-flex items-center justify-center
-w-20 h-20
-rounded-full
-shadow-[0_0_22px_rgba(255,204,0,0.75)]
-animate-auraflow
-"
->
+<div className="flex items-center justify-center w-20 h-20 rounded-full shadow-[0_0_22px_rgba(255,204,0,0.75)] animate-auraflow bg-slate-950/80">
 <img
 src="/penquin-logo.png"
 alt="PENQUIN Logo"
-className="
-w-20 h-20
-object-contain
-drop-shadow-[0_0_14px_rgba(255,200,0,0.55)]
-"
+className="w-22 h-22 object-contain drop-shadow-[0_0_14px_rgba(255,200,0,0.55)]"
 />
 </div>
 
@@ -175,19 +172,12 @@ drop-shadow-[0_0_14px_rgba(255,200,0,0.55)]
 <p className="text-xs font-semibold tracking-[0.2em] text-sky-400 uppercase">
 PenQuiQui Control Panel
 </p>
-<h1
-className="
-text-3xl sm:text-4xl
-font-semibold
-bg-gradient-to-r from-sky-200 via-emerald-300 to-amber-200
-bg-clip-text text-transparent
-"
->
+<h1 className="text-3xl sm:text-4xl font-semibold bg-gradient-to-r from-sky-200 via-emerald-300 to-amber-200 bg-clip-text text-transparent">
 PENQUIN Dashboard
 </h1>
 <p className="text-sm text-slate-300 max-w-xl">
-Connect your wallet, check your holdings, and swap ETH
-directly into <span className="font-semibold">PENQUIN</span>.
+Connect your wallet, check your holdings, and swap ETH directly
+into <span className="font-semibold">PENQUIN</span>.
 </p>
 
 <div className="flex flex-wrap gap-2 pt-1">
@@ -201,9 +191,13 @@ Token: PENQUIN
 </div>
 </div>
 
-{/* Right: RainbowKit connect button sits up here in layout */}
+{/* Right: Connect button */}
 <div className="self-stretch flex items-start sm:items-center justify-end">
-<span className="text-xs text-slate-400" />
+<ConnectButton
+showBalance={false}
+chainStatus="icon"
+accountStatus="address"
+/>
 </div>
 </div>
 
@@ -223,9 +217,7 @@ Live on-chain
 {isConnected ? (
 <div className="space-y-3">
 {balLoading ? (
-<p className="text-slate-300 text-sm">
-Fetching balance…
-</p>
+<p className="text-slate-300 text-sm">Fetching balance…</p>
 ) : (
 <p className="text-3xl sm:text-4xl font-semibold tracking-tight">
 {formattedBalance}{" "}
@@ -248,8 +240,8 @@ Connect your wallet to view your PENQUIN balance.
 )}
 
 <div className="mt-4 pt-4 border-t border-slate-700/60 text-[11px] text-slate-400">
-Tip: After your first swap, add PENQUIN to your wallet
-using this contract address so balances show up nicely.
+Tip: After your first swap, add PENQUIN to your wallet using this
+contract address so balances show up nicely.
 </div>
 </div>
 
@@ -269,9 +261,7 @@ Swap ETH for PENQUIN directly.
 </p>
 
 <div className="space-y-3">
-<label className="text-xs text-slate-300">
-Amount in ETH
-</label>
+<label className="text-xs text-slate-300">Amount in ETH</label>
 <div className="mt-1 flex items-center gap-2">
 <input
 type="number"
@@ -279,12 +269,7 @@ min="0"
 step="0.0001"
 value={ethAmount}
 onChange={(e) => setEthAmount(e.target.value)}
-className="
-flex-1 rounded-xl bg-slate-900/80 border border-slate-600/70
-px-3.5 py-2.5 text-sm text-slate-50
-focus:outline-none focus:ring-2 focus:ring-amber-400/70
-placeholder:text-slate-500
-"
+className="flex-1 rounded-xl bg-slate-900/80 border border-slate-600/70 px-3.5 py-2.5 text-sm text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400/70 placeholder:text-slate-500"
 placeholder="0.01"
 />
 <span className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-600/70 text-xs font-semibold text-slate-100">
@@ -294,7 +279,8 @@ ETH
 
 {ethPrice && (
 <p className="text-[11px] text-slate-400">
-ETH price: ${ethPrice.toLocaleString(undefined, {
+ETH price: $
+{ethPrice.toLocaleString(undefined, {
 maximumFractionDigits: 2,
 })}
 </p>
@@ -303,19 +289,12 @@ maximumFractionDigits: 2,
 
 <button
 onClick={handleSwap}
-disabled={!isConnected || isSwapping}
-className="
-w-full mt-2
-rounded-full
-bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300
-text-slate-900 font-semibold
-py-3
-shadow-[0_12px_30px_rgba(250,204,21,0.45)]
-hover:shadow-[0_16px_40px_rgba(250,204,21,0.65)]
-disabled:opacity-60 disabled:cursor-not-allowed
-transition-all
-animate-pulse-subtle
-"
+disabled={swapDisabled}
+className={`w-full mt-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 text-slate-900 font-semibold py-3 shadow-[0_12px_30px_rgba(250,204,21,0.45)] transition-all ${
+swapDisabled
+? "opacity-60 cursor-not-allowed"
+: "hover:shadow-[0_16px_40px_rgba(250,204,21,0.75)] hover:scale-[1.02] active:scale-[0.99] cursor-pointer"
+}`}
 >
 {isSwapping ? "Swapping..." : "Swap ETH for PENQUIN"}
 </button>
@@ -341,10 +320,10 @@ className="underline text-emerald-200"
 )}
 
 <div className="mt-4 pt-3 border-t border-amber-400/30 text-[11px] text-amber-50/80">
-This simple swap does not include slippage protection
-(<code className="font-mono">amountOutMin = 0</code>). For
-larger trades, you can also use the full Uniswap UI to set
-custom slippage.
+This simple swap does not include slippage protection (
+<code className="font-mono">amountOutMin = 0</code>). For larger
+trades, you can also use the full Uniswap UI to set custom
+slippage.
 </div>
 </div>
 </div>
