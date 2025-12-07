@@ -2,33 +2,40 @@
 
 import "@rainbow-me/rainbowkit/styles.css";
 import {
+getDefaultConfig,
 RainbowKitProvider,
 darkTheme,
-getDefaultConfig,
 } from "@rainbow-me/rainbowkit";
-import { WagmiProvider, http } from "wagmi";
-import { mainnet } from "wagmi/chains";
+import { WagmiConfig } from "wagmi";
+import { mainnet, bsc } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const config = getDefaultConfig({
-appName: "PENQUIN dApp",
-projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID ?? "",
-chains: [mainnet],
-transports: {
-[mainnet.id]: http(process.env.NEXT_PUBLIC_RPC_URL ?? ""),
-},
+// Wagmi + RainbowKit config (mainnet + BSC)
+export const wagmiConfig = getDefaultConfig({
+appName: "PENQUIN Dashboard",
+projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID ?? "test",
+chains: [mainnet, bsc],
+ssr: true,
 });
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }) {
 return (
-<WagmiProvider config={config}>
+<WagmiConfig config={wagmiConfig}>
 <QueryClientProvider client={queryClient}>
-<RainbowKitProvider theme={darkTheme()}>
+<RainbowKitProvider
+theme={darkTheme({
+accentColor: "#facc15", // amber
+accentColorForeground: "#020617", // near-black
+borderRadius: "large",
+})}
+>
 {children}
 </RainbowKitProvider>
 </QueryClientProvider>
-</WagmiProvider>
+</WagmiConfig>
 );
 }
+
+export default Providers;
