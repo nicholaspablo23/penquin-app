@@ -1,0 +1,489 @@
+/* app/sol/sol.module.css */
+
+.page {
+min-height: 100vh;
+padding: 44px 28px;
+display: flex;
+justify-content: center;
+background:
+radial-gradient(900px 500px at 18% 28%, rgba(20, 220, 190, 0.16), transparent 62%),
+radial-gradient(900px 520px at 82% 22%, rgba(170, 90, 255, 0.18), transparent 60%),
+radial-gradient(1200px 700px at 55% 80%, rgba(20, 220, 190, 0.08), transparent 65%),
+#080a12;
+}
+
+.shell {
+width: 100%;
+max-width: 1160px;
+}
+
+.panel {
+border-radius: 18px;
+padding: 26px 26px 22px;
+background: linear-gradient(180deg, rgba(20, 24, 40, 0.78), rgba(12, 14, 26, 0.68));
+border: 1px solid rgba(255, 255, 255, 0.08);
+box-shadow:
+0 18px 60px rgba(0, 0, 0, 0.55),
+inset 0 1px 0 rgba(255, 255, 255, 0.06);
+position: relative;
+overflow: hidden;
+}
+
+.panel::before {
+content: "";
+position: absolute;
+inset: -2px;
+border-radius: 18px;
+pointer-events: none;
+background: linear-gradient(
+90deg,
+rgba(20, 220, 190, 0.22),
+rgba(170, 90, 255, 0.18),
+rgba(20, 220, 190, 0.22)
+);
+filter: blur(18px);
+opacity: 0.55;
+}
+
+.panelInner {
+position: relative;
+z-index: 1;
+}
+
+.headerRow {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 8px;
+margin-bottom: 6px;
+}
+
+.brand {
+display: flex;
+align-items: flex-start;
+gap: 6px;
+}
+
+
+
+
+
+.kicker {
+font-size: 12px;
+letter-spacing: 0.12em;
+color: rgba(20, 220, 190, 0.9);
+font-weight: 700;
+margin-bottom: 6px;
+}
+
+.h1 {
+font-size: 34px;
+font-weight: 900;
+line-height: 1.05;
+margin: 0;
+color: rgba(255, 255, 255, 0.92);
+}
+
+.h1Accent {
+color: rgba(20, 220, 190, 0.95);
+text-shadow: 0 0 18px rgba(20, 220, 190, 0.24);
+}
+
+.sub {
+margin-top: 8px;
+font-size: 14px;
+color: rgba(255, 255, 255, 0.65);
+}
+
+.pillsRow {
+margin-top: 12px;
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.pill {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+padding: 7px 12px;
+border-radius: 999px;
+font-size: 12px;
+color: rgba(255, 255, 255, 0.75);
+background: rgba(255, 255, 255, 0.06);
+border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.pillDot {
+width: 7px;
+height: 7px;
+border-radius: 999px;
+background: rgba(20, 220, 190, 0.95);
+box-shadow: 0 0 10px rgba(20, 220, 190, 0.35);
+}
+
+.pillViolet {
+border-color: rgba(246, 29, 246, 0.29);
+background: rgba(170, 90, 255, 0.10);
+}
+
+.rightMeta {
+display: flex;
+flex-direction: column;
+align-items: flex-end;
+gap: 10px;
+}
+
+.topRightPills {
+display: flex;
+gap: 10px;
+align-items: center;
+}
+
+.smallPill {
+padding: 6px 10px;
+font-size: 12px;
+border-radius: 999px;
+color: rgba(255, 255, 255, 0.75);
+background: rgba(255, 255, 255, 0.06);
+border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.beta {
+background: rgba(170, 90, 255, 0.12);
+border-color: rgba(170, 90, 255, 0.28);
+}
+
+.grid {
+display: grid;
+grid-template-columns: 1.15fr 0.85fr;
+gap: 18px;
+margin-top: 10px;
+}
+
+@media (max-width: 980px) {
+.grid {
+grid-template-columns: 1fr;
+}
+.rightMeta {
+align-items: flex-start;
+}
+}
+
+.card {
+border-radius: 16px;
+padding: 18px;
+background: rgba(8, 10, 18, 0.35);
+border: 1px solid rgba(255, 255, 255, 0.08);
+box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+min-height: 220px;
+}
+
+.cardTitleRow {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 14px;
+margin-bottom: 14px;
+}
+
+.cardTitle {
+font-size: 18px;
+font-weight: 900;
+color: rgba(255, 255, 255, 0.9);
+}
+
+.quickRef {
+padding: 7px 10px;
+border-radius: 10px;
+font-size: 12px;
+font-weight: 800;
+color: rgba(20, 220, 190, 0.95);
+background: rgba(20, 220, 190, 0.10);
+border: 1px solid rgba(20, 220, 190, 0.22);
+}
+
+.rows {
+display: grid;
+gap: 10px;
+}
+
+.row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 10px 12px;
+border-radius: 12px;
+background: rgba(255, 255, 255, 0.04);
+border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.label {
+color: rgba(255, 255, 255, 0.55);
+font-size: 13px;
+}
+
+.value {
+color: rgba(255, 255, 255, 0.82);
+font-size: 13px;
+font-weight: 700;
+}
+
+.tipBox {
+margin-top: 14px;
+padding: 12px;
+border-radius: 12px;
+background: rgba(20, 220, 190, 0.08);
+border: 1px solid rgba(20, 220, 190, 0.18);
+color: rgba(255, 255, 255, 0.75);
+font-size: 13px;
+}
+
+.tipTitle {
+color: rgba(20, 220, 190, 0.95);
+font-weight: 900;
+margin-bottom: 6px;
+}
+
+.buyTopRow {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+}
+
+.routePill {
+padding: 6px 10px;
+border-radius: 999px;
+font-size: 12px;
+color: rgba(255, 255, 255, 0.75);
+background: rgba(170, 90, 255, 0.10);
+border: 1px solid rgba(170, 90, 255, 0.22);
+}
+
+.inputRow {
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 10px;
+align-items: center;
+margin: 10px 0 10px;
+}
+
+.input {
+height: 40px;
+border-radius: 12px;
+padding: 0 12px;
+background: rgba(255, 255, 255, 0.05);
+border: 1px solid rgba(255, 255, 255, 0.10);
+color: rgba(255, 255, 255, 0.9);
+outline: none;
+}
+
+.tokenTag {
+height: 40px;
+padding: 0 12px;
+border-radius: 12px;
+display: inline-flex;
+align-items: center;
+color: rgba(255, 255, 255, 0.75);
+background: rgba(255, 255, 255, 0.05);
+border: 1px solid rgba(255, 255, 255, 0.10);
+font-weight: 800;
+}
+
+.statusRow {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin: 6px 0 12px;
+color: rgba(255, 255, 255, 0.65);
+font-size: 13px;
+}
+
+.buyBtn {
+width: 100%;
+height: 46px;
+border-radius: 14px;
+border: 1px solid rgba(20, 220, 190, 0.30);
+background: rgba(20, 220, 190, 0.18);
+color: rgba(255, 255, 255, 0.90);
+font-weight: 900;
+letter-spacing: 0.02em;
+cursor: pointer;
+transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+box-shadow:
+0 0 0 rgba(20, 220, 190, 0),
+inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.buyBtn:hover {
+transform: translateY(-1px);
+background: rgba(85, 242, 218, 0.26);
+box-shadow:
+0 0 24px rgba(20, 220, 190, 0.28),
+0 0 58px rgba(170, 90, 255, 0.12);
+}
+
+/* Your JSX references this class — define it */
+.buyBtnReady {
+opacity: 1;
+filter: none;
+}
+
+.buyBtnDisabled {
+cursor: not-allowed;
+opacity: 0.55;
+filter: saturate(0.85);
+}
+
+.checks {
+margin-top: 12px;
+display: grid;
+gap: 6px;
+color: rgba(255, 255, 255, 0.78);
+font-size: 13px;
+}
+
+.checkItem {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.footerNote {
+margin-top: 14px;
+color: rgba(255, 255, 255, 0.50);
+font-size: 12px;
+text-align: center;
+}
+
+/* --- Solana Gradient Text (Teal -> Violet) --- */
+.solGradientText {
+background: linear-gradient(90deg,
+#5ddda7 0%,
+#16df95 35%,
+#852cd8 75%,
+#ef24d0 100%
+);
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+}
+
+.solGlowText {
+text-shadow:
+0 0 18px rgba(20, 241, 149, 0.25),
+0 0 26px rgba(168, 85, 247, 0.22);
+}
+
+.solSoftTitle {
+color: rgba(255,255,255,0.92);
+text-shadow: 0 0 20px rgba(20, 241, 149, 0.10);
+}
+
+@keyframes solPulse {
+0%, 100% {
+box-shadow:
+0 0 0 rgba(140, 50, 255, 0),
+0 0 18px rgba(140, 50, 255, 0.22);
+transform: translateZ(0) scale(1);
+filter: saturate(1);
+}
+50% {
+box-shadow:
+0 0 0 rgba(140, 50, 255, 0),
+0 0 28px rgba(140, 50, 255, 0.45);
+transform: translateZ(0) scale(1.01);
+filter: saturate(1.15);
+}
+}
+
+@keyframes solTextGlow {
+0%, 100% { text-shadow: 0 0 10px rgba(0, 255, 200, 0.12), 0 0 14px rgba(160, 70, 255, 0.18); }
+50% { text-shadow: 0 0 14px rgba(0, 255, 200, 0.22), 0 0 22px rgba(160, 70, 255, 0.35); }
+}
+
+.pulse {
+animation: solPulse 3.2s ease-in-out infinite;
+will-change: box-shadow, transform, filter;
+}
+
+.pulseSlow {
+animation: solPulse 4.4s ease-in-out infinite;
+will-change: box-shadow, transform, filter;
+}
+
+.textPulse {
+animation: solTextGlow 3.2s ease-in-out infinite;
+}
+
+.errorText { margin-top: 10px; font-size: 13px; opacity: 0.95; }
+.successText { margin-top: 10px; font-size: 13px; opacity: 0.95; }
+
+/* === LOGO (clean + no filled circle) === */
+
+/* Outer glow wrapper (glow only, no background disc) */
+.logoGlowWrap {
+position: relative;
+width: 96px;
+height: 96px;
+border-radius: 9999px;
+display: grid;
+place-items: center;
+
+/* IMPORTANT: no filled circle */
+background: transparent;
+border: none;
+outline: none;
+
+/* subtle ambient glow */
+box-shadow:
+0 0 18px rgba(0, 255, 210, 0.35),
+0 0 38px rgba(0, 255, 210, 0.18),
+0 0 68px rgba(0, 255, 210, 0.12);
+}
+
+/* Inner wrapper that crops the logo into a circle */
+.logoWrap {
+width: 96px;
+height: 96px;
+border-radius: 9999px;
+overflow: hidden; /* makes the logo circular */
+background: transparent; /* no disc */
+display: grid;
+place-items: center;
+}
+
+/* The logo image itself */
+.logo {
+width: 100%;
+height: 100%;
+display: block;
+object-fit: cover;
+
+/* no ring / no fill / no extra shadow */
+background: transparent !important;
+outline: none !important;
+box-shadow: none !important;
+border-radius: 9999px;
+}
+
+
+
+
+.pillGreen {
+background: rgba(44, 255, 154, 0.15);
+color: #0cc069;
+}
+
+.txLink {
+color: #2dffb3; /* your green */
+text-decoration: underline;
+font-weight: 600;
+}
+
+.txLink:hover {
+text-decoration: underline;
+filter: brightness(1.1);
+}
+
