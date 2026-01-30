@@ -1,8 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import dynamicImport from "next/dynamic";
-
-const SolClient = dynamicImport(() => import("./SolClient"), { ssr: false });
+import SolClient from "./SolClient";
 
 export default function Page() {
 return <SolClient />;
