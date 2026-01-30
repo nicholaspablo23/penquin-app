@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from "react";
 
-const SOL_RPC =
-process.env.NEXT_PUBLIC_SOLANA_RPC ||
-"https://api.mainnet-beta.solana.com";
-
 export default function SolClient() {
 const [rpc, setRpc] = useState("");
 
 useEffect(() => {
-setRpc(SOL_RPC);
+const v = (process.env.NEXT_PUBLIC_SOLANA_RPC || "").trim();
+setRpc(v || "https://api.mainnet-beta.solana.com");
 }, []);
 
 return (
