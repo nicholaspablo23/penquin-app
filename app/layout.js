@@ -1,7 +1,13 @@
+import "./globals.css";
+
 export const metadata = {
-title: "PENQUIN SOL Dashboard",
+title: "PENQUIN",
 };
 
-export default function SolLayout({ children }) {
-return children;
+export default function RootLayout({ children }) {
+return (
+<html lang="en">
+<body>{children}</body>
+</html>
+);
 }

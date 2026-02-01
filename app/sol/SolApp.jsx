@@ -1,12 +1,12 @@
 "use client";
 
-import SolanaProviders from "./SolanaProviders";
+import SolanaProviders from "./SolanaProvidersClient";
 import SolPage from "./SolPage";
 
 export default function SolApp() {
 return (
-<SolanaProviders>
+<SolanaProvidersClient>
 <SolPage />
-</SolanaProviders>
+</SolanaProvidersClient>
 );
 }

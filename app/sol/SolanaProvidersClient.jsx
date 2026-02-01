@@ -3,27 +3,27 @@
 import { useMemo } from "react";
 import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
+import {
+PhantomWalletAdapter,
+SolflareWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-function normalizeRpc(raw) {
-const v = String(raw || "").trim();
-if (!v) return "https://api.mainnet-beta.solana.com";
-if (/^https?:\/\//i.test(v)) return v;
-return `https://${v}`;
+function normalizeEndpoint(raw) {
+const fallback = "https://api.mainnet-beta.solana.com";
+const v = (raw || "").trim();
+
+if (!v) return fallback;
+if (v.startsWith("http://") || v.startsWith("https://")) return v;
+
+// If someone pasted without protocol, fix it safely:
+return `https://${v.replace(/^\/+/, "")}`;
 }
 
 export default function SolanaProvidersClient({ children }) {
 const endpoint = useMemo(() => {
-const raw =
-process.env.NEXT_PUBLIC_SOL_RPC ||
-process.env.NEXT_PUBLIC_SOLANA_RPC ||
-process.env.NEXT_PUBLIC_SOL_RPC_URL ||
-
-"https://api.mainnet-beta.solana.com";
-
-return normalizeRpc(raw);
+return normalizeEndpoint(process.env.NEXT_PUBLIC_SOL_RPC);
 }, []);
 
 const wallets = useMemo(

@@ -1,10 +1,10 @@
-import dynamic from "next/dynamic";
+export const metadata = {
+title: "PENQUIN SOL Dashboard",
+};
 
 export const dynamic = "force-dynamic";
 
-const SolanaProvidersClient = dynamic(() => import("./SolanaProvidersClient"), {
-ssr: false,
-});
+import SolanaProvidersClient from "./SolanaProvidersClient";
 
 export default function SolLayout({ children }) {
 return <SolanaProvidersClient>{children}</SolanaProvidersClient>;
