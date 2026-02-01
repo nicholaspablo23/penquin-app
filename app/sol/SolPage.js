@@ -1,7 +1,5 @@
 "use client";
 
-const SOL_RPC =
-process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
 import { Buffer } from "buffer";
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -11,6 +9,9 @@ import { LAMPORTS_PER_SOL, VersionedTransaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import styles from "./sol.module.css";
+
+const SOL_RPC =
+process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
 
 const WalletButtonClient = dynamic(() => import("./WalletButtonClient"), {
 ssr: false,
