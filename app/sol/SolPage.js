@@ -11,7 +11,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import styles from "./sol.module.css";
 
 const SOL_RPC =
-process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+process.env.NEXT_PUBLIC_SOL_RPC || "https://api.mainnet-beta.solana.com";
 
 const WalletButtonClient = dynamic(() => import("./WalletButtonClient"), {
 ssr: false,
