@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-const RPC =
-process.env.SOL_RPC || "https://api.mainnet-beta.solana.com";
+const RPC = process.env.SOL_RPC || process.env.NEXT_PUBLIC_SOL_RPC;
+if (!RPC) {
+return NextResponse.json(
+{ error: "Missing SOL_RPC / NEXT_PUBLIC_SOL_RPC" },
+{ status: 500 }
+);
+}
 
 export async function GET(req) {
 try {
