@@ -11,7 +11,7 @@ SolflareWalletAdapter,
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 function normalizeEndpoint(raw) {
-const fallback = "https://api.mainnet-beta.solana.com";
+const fallback = "https://mainnet.helius-rpc.com/?api-key=96e972be-5199-4e72-a27c-44fc904f0ced";
 const v = (raw || "").trim();
 
 if (!v) return fallback;
