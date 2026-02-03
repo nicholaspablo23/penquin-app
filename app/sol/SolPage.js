@@ -10,8 +10,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import styles from "./sol.module.css";
 
-const SOL_RPC =
-process.env.NEXT_PUBLIC_SOL_RPC || "https://api.mainnet-beta.solana.com";
+const SOL_RPC = process.env.NEXT_PUBLIC_SOL_RPC;
+if (!SOL_RPC) throw new Error("Missing NEXT_PUBLIC_SOL_RPC");
 
 const WalletButtonClient = dynamic(() => import("./WalletButtonClient"), {
 ssr: false,
