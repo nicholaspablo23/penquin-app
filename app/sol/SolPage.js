@@ -59,10 +59,17 @@ if (alive) setSolBalance(null);
 return;
 }
 
-const lamports = await connection.getBalance(publicKey);
-const sol = lamports / LAMPORTS_PER_SOL;
+const res = await fetch(`/api/sol/balance?address=${publicKey.toBase58()}`);
 
-if (alive) setSolBalance(sol);
+console.log("balance fetch status:", res.status);
+
+const data = await res.json();
+console.log("balance data:", data);
+
+if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+
+if (alive) setSolBalance(data.sol);
+
 } catch (e) {
 console.error("getBalance failed:", e);
 const msg = String(e?.message || "");
